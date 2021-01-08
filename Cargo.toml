@@ -1,0 +1,16 @@
+[package]
+name = "pkcs11-uri"
+version = "0.1.0"
+authors = ["Nicolas Stalder <n@stalder.io>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+pkcs11 = "0.5.0"
+queryst = { git = "https://github.com/nickray/queryst", features = ["semicolon-delimiters"], branch = "semicolon-delimiters" }
+uriparse = { git = "https://github.com/nickray/uriparse-rs", branch = "pkcs11-typo" }
+
+[dev-dependencies]
+serial_test = "0.5.1"
