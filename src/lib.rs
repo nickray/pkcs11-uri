@@ -19,8 +19,6 @@ mod tests;
 
 use anyhow::anyhow;
 
-type StrPair<'a> = (&'a str, &'a str);
-
 fn parse_usize<'a>(value: &'a str) -> Result<usize, &'a str> {
     Ok(value.parse().or(Err(value))?)
 }
@@ -82,39 +80,57 @@ pub struct Version {
 }
 
 macro_rules! generate {
-    ($Attributes:ident: $($attribute:ident($value:ty, $converter:tt) = $name:literal,)*) => {
+    (($Attributes:ident, $delimiter:literal): $($attribute:ident($value:ty, $converter:tt) = $name:literal,)*) => {
 
         // #[derive(Copy, Clone, Debug, Deserialize, enum_iterator::IntoEnumIterator, PartialEq, Serialize)]
-        #[derive(Clone, Debug, PartialEq)]
-        pub enum $Attributes { $(
-            $attribute($value),
+        #[derive(Clone, Debug, Default, PartialEq)]
+        pub struct $Attributes { $(
+            pub $attribute: Option<$value>,
         )* }
 
-        impl<'a> TryFrom<(&'a str, &'a str)> for $Attributes {
-            type Error = StrPair<'a>;
-            fn try_from(pair: (&'a str, &'a str)) -> std::result::Result<Self, Self::Error> {
-                use $Attributes::*;
-                let (key, value) = pair;
-                Ok(match (key, value) { $(
-                    ($name, value) => $attribute($converter(value).or(Err(pair))?),
-                        // Err(pair).with_context(|| Err(anyhow!("Value {} of attribute {} cannot be mapped", value, $name))))?),
-                )*
-                    _ => return Err(pair),
-                })
+        impl<'a> TryFrom<&'a str> for $Attributes {
+            type Error = &'a str;
+            fn try_from(input: &'a str) -> std::result::Result<Self, Self::Error> {
+                let mut attributes: $Attributes = Default::default();
+                for component in input.split($delimiter) {
+                    let tuple: Vec<&str> = component.splitn(2, '=').collect();
+                    let [key, value]: [&str; 2] = tuple.as_slice().try_into().unwrap();
+                    match key { $(
+                        $name => {
+                            let value: $value = $converter(value).or(Err(input))?;
+                            if attributes.$attribute.is_some() {
+                                return Err(input);
+                            }
+                            attributes.$attribute = Some(value);
+                        }
+                    )*
+                        _ => return Err(key),
+                    }
+                }
+
+                Ok(attributes)
             }
         }
     }
 }
 
+generate! { (PathAttributes, ';'):
+    id(Vec<u8>, percent_decode_bytes) = "id",
+    library_description(String, percent_decode_string) = "library-description",
+    library_manufacturer(String, percent_decode_string) = "library-manufacturer",
+    library_version(Version, parse_library_version) = "library-version",
+    manufacturer(String, percent_decode_string) = "manufacturer",
+    model(String, percent_decode_string) = "model",
+    object_label(String, percent_decode_string) = "object",
+    serial([u8; 16], parse_serial_number) = "serial",
+    slot_description(String, percent_decode_string) = "slot-description",
+    slot_id(usize, parse_usize) = "slot-id",
+    slot_manufacturer(String, percent_decode_string) = "slot-manufacturer",
+    token_label(String, percent_decode_string) = "token",
+    object_class(ObjectClass, parse_object_class) = "type",
 
-// #[derive(Copy, Clone, Debug, PartialEq)]
-// pub struct SlotIdValue(usize);
-// impl<'a> TryFrom<&'a str> for SlotIdValue {
-//     type Error = &'a str;
-//     fn try_from(s: &'a str) -> std::result::Result<Self, Self::Error> {
-//         Ok(SlotIdValue(s.parse().or(Err(s))?))
-//     }
-// }
+    // TODO: vendor attributes
+}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ObjectClass {
@@ -140,25 +156,7 @@ impl<'a> TryFrom<&'a str> for ObjectClass {
     }
 }
 
-generate! { PathAttribute:
-    Id(Vec<u8>, percent_decode_bytes) = "id",
-    LibraryDescription(String, percent_decode_string) = "library-description",
-    LibraryManufacturer(String, percent_decode_string) = "library-manufacturer",
-    LibraryVersion(Version, parse_library_version) = "library-version",
-    Manufacturer(String, percent_decode_string) = "manufacturer",
-    Model(String, percent_decode_string) = "model",
-    ObjectLabel(String, percent_decode_string) = "object",
-    Serial([u8; 16], parse_serial_number) = "serial",
-    SlotDescription(String, percent_decode_string) = "slot-description",
-    SlotId(usize, parse_usize) = "slot-id",
-    SlotManufacturer(String, percent_decode_string) = "slot-manufacturer",
-    TokenLabel(String, percent_decode_string) = "token",
-    Type(ObjectClass, parse_object_class) = "type",
-
-    // TODO: vendor attributes
-}
-
-generate! { QueryAttribute:
+generate! { (QueryAttributes, '&'):
 
     // should these be merged, and expect at most one of them?
     // NOTE: "the "pin-source" attribute value format and interpretation is left to be implementation specific"
@@ -166,12 +164,12 @@ generate! { QueryAttribute:
     // - either a file/https URI, or
     // - a specification how to call an external application (e.g., `|/usr/bin/echo $PIN` perhaps?)
     // I think it would be useful to support environment variables directly (e.g., `env:PIN`)
-    PinSource(String, percent_decode_string) = "pin-source",
-    PinValue(String, percent_decode_string) = "pin-value",
+    pin_source(String, percent_decode_string) = "pin-source",
+    pin_value(String, percent_decode_string) = "pin-value",
 
     // should these be merged, and expect at most one of them?
-    ModuleName(String, percent_decode_string) = "module-name",
-    ModulePath(String, percent_decode_string) = "module-path",
+    module_name(String, percent_decode_string) = "module-name",
+    module_path(String, percent_decode_string) = "module-path",
 
     // TODO: vendor attributes
 }
@@ -179,8 +177,8 @@ generate! { QueryAttribute:
 /// Parsed [RFC 7512](https://tools.ietf.org/html/rfc7512) PKCS #11 URI
 #[derive(Clone, Debug, PartialEq)]
 pub struct Pkcs11Uri {
-    pub path_attributes: Vec<PathAttribute>,
-    pub query_attributes: Vec<QueryAttribute>,
+    pub path_attributes: PathAttributes,
+    pub query_attributes: QueryAttributes,
 }
 
 impl Pkcs11Uri {
@@ -213,29 +211,11 @@ impl<'a> TryFrom<&'a str> for Pkcs11Uri {
 
         // 2. parse Path Attributes
         let segment = uri.path().segments()[0].as_str();
-
-        let mut path_attributes = Vec::<PathAttribute>::new();
-        for (key, value) in segment.split(';').map(|component| {
-            let tuple: Vec<&str> = component.splitn(2, '=').collect();
-            let [key, value]: [&str; 2] = tuple.as_slice().try_into().unwrap();
-            (key, value)
-        }) {
-            let attribute = PathAttribute::try_from((key, value)).unwrap();
-            path_attributes.push(attribute);
-        }
+        let path_attributes = PathAttributes::try_from(segment).unwrap();
 
         // 3. parse Query Attributes
         let query = uri.query().map(|query| query.as_str()).unwrap_or("");
-
-        let mut query_attributes: Vec<QueryAttribute> = Default::default();
-        for (key, value) in query.split('&').map(|component| {
-            let tuple: Vec<&str> = component.splitn(2, '=').collect();
-            let [key, value]: [&str; 2] = tuple.as_slice().try_into().unwrap();
-            (key, value)
-        }) {
-            let attribute = QueryAttribute::try_from((key, value)).unwrap();
-            query_attributes.push(attribute);
-        }
+        let query_attributes = QueryAttributes::try_from(query).unwrap();
 
         // 4. wrap up
         let parsed_uri = Pkcs11Uri { path_attributes, query_attributes };
@@ -247,6 +227,7 @@ impl<'a> TryFrom<&'a str> for Pkcs11Uri {
 pub fn identify(uri_str: &str) -> anyhow::Result<Vec<Object>> {
     // let uri_str = "pkcs11:object=my-signing-key;type=private;serial=DECC0401648?pin-source=file:/etc/token";
     let _uri = Pkcs11Uri::try_from(uri_str)?;
+
     todo!();
 }
 
