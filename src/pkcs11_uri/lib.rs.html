@@ -245,6 +245,8 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! PKCS#11 URI</span>
 <span class="doccomment">//!</span>
@@ -436,6 +438,9 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">anyhow</span>::<span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">uri_str</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+
+        <span class="comment">// 1. uriparse from string, check validity</span>
+
         <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">uriparse</span>::<span class="ident">URIReference</span>::<span class="ident">try_from</span>(<span class="ident">uri_str</span>)<span class="question-mark">?</span>;
         <span class="comment">// dbg!(&amp;uri);</span>
 
@@ -450,7 +455,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;URI should have exactly one segment&quot;</span>));
         }
 
-        <span class="comment">// Path Attributes</span>
+        <span class="comment">// 2. parse Path Attributes</span>
         <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">path</span>().<span class="ident">segments</span>()[<span class="number">0</span>].<span class="ident">as_str</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_attributes</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">PathAttribute</span><span class="op">&gt;</span>::<span class="ident">new</span>();
@@ -463,7 +468,7 @@
             <span class="ident">path_attributes</span>.<span class="ident">push</span>(<span class="ident">attribute</span>);
         }
 
-        <span class="comment">// Query Attributes</span>
+        <span class="comment">// 3. parse Query Attributes</span>
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">query</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">query</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query_attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryAttribute</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
@@ -476,8 +481,7 @@
             <span class="ident">query_attributes</span>.<span class="ident">push</span>(<span class="ident">attribute</span>);
         }
 
-
-        <span class="comment">// wrap up</span>
+        <span class="comment">// 4. wrap up</span>
         <span class="kw">let</span> <span class="ident">parsed_uri</span> <span class="op">=</span> <span class="ident">Pkcs11Uri</span> { <span class="ident">path_attributes</span>, <span class="ident">query_attributes</span> };
 
         <span class="prelude-val">Ok</span>(<span class="ident">parsed_uri</span>)
