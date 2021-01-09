@@ -8,8 +8,8 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1"
+percent-encoding = "2.1.0"
 pkcs11 = "0.5.0"
-queryst = { git = "https://github.com/nickray/queryst", features = ["semicolon-delimiters"], branch = "semicolon-delimiters" }
 uriparse = { git = "https://github.com/nickray/uriparse-rs", branch = "pkcs11-typo" }
 
 [dev-dependencies]
