@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ObjectClass",""],["PathAttribute",""],["QueryAttribute",""]],"fn":[["identify",""]],"struct":[["Pkcs11Uri","Parsed RFC 7512 PKCS #11 URI"],["Version",""]],"type":[["Object",""],["Session",""]]});
+initSidebarItems({"enum":[["ObjectClass",""]],"struct":[["PathAttributes",""],["Pkcs11Uri","Parsed RFC 7512 PKCS #11 URI"],["QueryAttributes",""],["Version",""]],"type":[["Context",""],["ObjectHandle",""],["SessionHandle",""],["SlotId",""]]});

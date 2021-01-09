@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["pkcs11_uri"] = [{"text":"impl Clone for Version","synthetic":false,"types":[]},{"text":"impl Clone for ObjectClass","synthetic":false,"types":[]},{"text":"impl Clone for PathAttribute","synthetic":false,"types":[]},{"text":"impl Clone for QueryAttribute","synthetic":false,"types":[]},{"text":"impl Clone for Pkcs11Uri","synthetic":false,"types":[]}];
+implementors["pkcs11_uri"] = [{"text":"impl Clone for Version","synthetic":false,"types":[]},{"text":"impl Clone for PathAttributes","synthetic":false,"types":[]},{"text":"impl Clone for ObjectClass","synthetic":false,"types":[]},{"text":"impl Clone for QueryAttributes","synthetic":false,"types":[]},{"text":"impl Clone for Pkcs11Uri","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
