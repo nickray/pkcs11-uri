@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ObjectClass",""],["PathAttribute",""],["QueryAttribute",""]],"fn":[["identify",""]],"struct":[["Pkcs11Uri",""],["SlotIdValue",""],["Version",""]],"type":[["Object",""],["Session",""]]});
+initSidebarItems({"enum":[["ObjectClass",""],["PathAttribute",""],["QueryAttribute",""]],"fn":[["identify",""]],"struct":[["Pkcs11Uri",""],["Version",""]],"type":[["Object",""],["Session",""]]});

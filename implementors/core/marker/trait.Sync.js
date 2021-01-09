@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["pkcs11_uri"] = [{"text":"impl Sync for Version","synthetic":true,"types":[]},{"text":"impl Sync for SlotIdValue","synthetic":true,"types":[]},{"text":"impl Sync for Pkcs11Uri","synthetic":true,"types":[]},{"text":"impl Sync for ObjectClass","synthetic":true,"types":[]},{"text":"impl Sync for PathAttribute","synthetic":true,"types":[]},{"text":"impl Sync for QueryAttribute","synthetic":true,"types":[]}];
+implementors["pkcs11_uri"] = [{"text":"impl Sync for Version","synthetic":true,"types":[]},{"text":"impl Sync for Pkcs11Uri","synthetic":true,"types":[]},{"text":"impl Sync for ObjectClass","synthetic":true,"types":[]},{"text":"impl Sync for PathAttribute","synthetic":true,"types":[]},{"text":"impl Sync for QueryAttribute","synthetic":true,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
