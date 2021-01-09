@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["pkcs11_uri"] = [{"text":"impl Freeze for Version","synthetic":true,"types":[]},{"text":"impl Freeze for SlotIdValue","synthetic":true,"types":[]},{"text":"impl Freeze for Pkcs11Uri","synthetic":true,"types":[]},{"text":"impl Freeze for ObjectClass","synthetic":true,"types":[]},{"text":"impl Freeze for PathAttribute","synthetic":true,"types":[]},{"text":"impl Freeze for QueryAttribute","synthetic":true,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
