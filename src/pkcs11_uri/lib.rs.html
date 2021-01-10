@@ -404,6 +404,18 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! PKCS#11 URI</span>
 <span class="doccomment">//!</span>
@@ -421,7 +433,7 @@
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> <span class="ident">pkcs11</span>::<span class="ident">Ctx</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SessionHandle</span> <span class="op">=</span> <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_SESSION_HANDLE</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ObjectHandle</span> <span class="op">=</span>  <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_OBJECT_HANDLE</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ObjectHandle</span> <span class="op">=</span> <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_OBJECT_HANDLE</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SlotId</span> <span class="op">=</span> <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_SLOT_ID</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -429,23 +441,26 @@
 
 <span class="kw">use</span> <span class="ident">anyhow</span>::<span class="ident">anyhow</span>;
 
-<span class="kw">fn</span> <span class="ident">parse_slot_id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SlotId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_slot_id</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SlotId</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">or</span>(<span class="prelude-val">Err</span>(<span class="ident">value</span>))<span class="question-mark">?</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">percent_decode_string</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">percent_encoding</span>::<span class="ident">percent_decode_str</span>(<span class="ident">value</span>).<span class="ident">decode_utf8</span>().<span class="ident">or</span>(<span class="prelude-val">Err</span>(<span class="ident">value</span>))<span class="question-mark">?</span>.<span class="ident">into_owned</span>())
+<span class="kw">fn</span> <span class="ident">percent_decode_string</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Ok</span>(<span class="ident">percent_encoding</span>::<span class="ident">percent_decode_str</span>(<span class="ident">value</span>)
+        .<span class="ident">decode_utf8</span>()
+        .<span class="ident">or</span>(<span class="prelude-val">Err</span>(<span class="ident">value</span>))<span class="question-mark">?</span>
+        .<span class="ident">into_owned</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">percent_decode_bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">percent_decode_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">percent_encoding</span>::<span class="ident">percent_decode_str</span>(<span class="ident">value</span>).<span class="ident">collect</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">parse_object_class</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectClass</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_object_class</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectClass</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">try_into</span>().<span class="ident">or</span>(<span class="prelude-val">Err</span>(<span class="ident">value</span>))<span class="question-mark">?</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_library_version</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Version</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_library_version</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Version</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">value</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>) {
         <span class="kw">let</span> <span class="ident">tuple</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;.&#39;</span>).<span class="ident">collect</span>();
         <span class="kw">let</span> [<span class="ident">major</span>, <span class="ident">minor</span>]: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">2</span>] <span class="op">=</span> <span class="ident">tuple</span>.<span class="ident">as_slice</span>().<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
@@ -464,10 +479,10 @@
 <span class="comment">// In rust-pkcs11, this is `pkcs11::types::padding::BlankPaddedString16`, even though the docs</span>
 <span class="comment">// claim it&#39;s a UTF-8 string</span>
 
-<span class="kw">fn</span> <span class="ident">parse_serial_number</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">16</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_serial_number</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">16</span>], <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">characters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">percent_encoding</span>::<span class="ident">percent_decode_str</span>(<span class="ident">value</span>).<span class="ident">collect</span>();
     <span class="kw">if</span> <span class="ident">characters</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">16</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">value</span>)
+        <span class="prelude-val">Err</span>(<span class="ident">value</span>)
     } <span class="kw">else</span> {
         <span class="ident">characters</span>.<span class="ident">resize</span>(<span class="number">16</span>, <span class="string">b&#39; &#39;</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">characters</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
@@ -568,7 +583,7 @@
             <span class="string">&quot;private&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrivateKey</span>,
             <span class="string">&quot;public&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PublicKey</span>,
             <span class="string">&quot;secret-key&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SecretKey</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>),
         })
     }
 }
@@ -609,7 +624,6 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">anyhow</span>::<span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">uri_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-
         <span class="comment">// 0. strip whitespace</span>
         <span class="kw">let</span> <span class="ident">uri_string</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">uri_str</span>.<span class="ident">chars</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_whitespace</span>()).<span class="ident">collect</span>();
 
@@ -641,14 +655,16 @@
         <span class="kw">let</span> <span class="ident">query_attributes</span> <span class="op">=</span> <span class="ident">QueryAttributes</span>::<span class="ident">try_from</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="comment">// 4. wrap up</span>
-        <span class="kw">let</span> <span class="ident">parsed_uri</span> <span class="op">=</span> <span class="ident">Pkcs11Uri</span> { <span class="ident">path_attributes</span>, <span class="ident">query_attributes</span> };
+        <span class="kw">let</span> <span class="ident">parsed_uri</span> <span class="op">=</span> <span class="ident">Pkcs11Uri</span> {
+            <span class="ident">path_attributes</span>,
+            <span class="ident">query_attributes</span>,
+        };
 
         <span class="prelude-val">Ok</span>(<span class="ident">parsed_uri</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Pkcs11Uri</span> {
-
     <span class="kw">fn</span> <span class="ident">matches_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs11</span>::<span class="ident">Ctx</span>, <span class="ident">slot_id</span>: <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_SLOT_ID</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="comment">// slot_id, slot_description, slot_manufacturer</span>
 
@@ -717,11 +733,12 @@
         <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>();
 
         <span class="kw">let</span> <span class="ident">slots</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>).<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>().<span class="ident">copied</span>()
+            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">iter</span>()
+            .<span class="ident">copied</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">matches_slot</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">slot</span>))
-            .<span class="ident">collect</span>()
-        ;
+            .<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">slots</span>)
     }
@@ -730,12 +747,13 @@
         <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>();
 
         <span class="kw">let</span> <span class="ident">slots</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>).<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>().<span class="ident">copied</span>()
+            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">iter</span>()
+            .<span class="ident">copied</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">matches_slot</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">slot</span>))
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">matches_token</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">slot</span>))
-            .<span class="ident">collect</span>()
-        ;
+            .<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">slots</span>)
     }
@@ -745,16 +763,17 @@
 
         <span class="comment">// 1. find the slot</span>
         <span class="kw">let</span> <span class="ident">slots</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>).<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>().<span class="ident">copied</span>()
+            .<span class="ident">get_slot_list</span>(<span class="bool-val">true</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">iter</span>()
+            .<span class="ident">copied</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">matches_slot</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">slot</span>))
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">matches_token</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">slot</span>))
-            .<span class="ident">collect</span>()
-        ;
+            .<span class="ident">collect</span>();
 
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;slots: {:?}&quot;</span>, <span class="ident">slots</span>);
 
-        <span class="kw">if</span> <span class="ident">slots</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">slots</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No slots found&quot;</span>));
         }
         <span class="kw">if</span> <span class="ident">slots</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
@@ -766,10 +785,15 @@
         <span class="comment">// 2. create a logged-in session with the slot</span>
 
         <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKF_SERIAL_SESSION</span> <span class="op">|</span> <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKF_RW_SESSION</span>;
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">open_session</span>(<span class="ident">slot</span>, <span class="ident">flags</span>, <span class="comment">/*application: */</span> <span class="prelude-val">None</span>, <span class="comment">/*notify: */</span> <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ctx</span>
+            .<span class="ident">open_session</span>(
+                <span class="ident">slot</span>, <span class="ident">flags</span>, <span class="comment">/*application: */</span> <span class="prelude-val">None</span>, <span class="comment">/*notify: */</span> <span class="prelude-val">None</span>,
+            )
+            .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">maybe_pin</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_attributes</span>.<span class="ident">pin_value</span>.<span class="ident">as_deref</span>();
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">maybe_pin</span>);
-        <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="ident">maybe_pin</span>).<span class="ident">unwrap</span>();
+        <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="ident">maybe_pin</span>)
+            .<span class="ident">unwrap</span>();
 
         <span class="comment">// 3. find the object</span>
         <span class="comment">// object_class: Option&lt;ObjectClass&gt;</span>
@@ -786,7 +810,8 @@
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">object_class</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path_attributes</span>.<span class="ident">object_class</span> {
             <span class="kw">let</span> <span class="ident">raw_object_class</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">object_class</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="kw">_</span>;
-            <span class="ident">template</span>.<span class="ident">push</span>(<span class="ident">Attribute</span>::<span class="ident">new</span>(<span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKA_CLASS</span>).<span class="ident">with_ck_ulong</span>(<span class="kw-2">&amp;</span><span class="ident">raw_object_class</span>));
+            <span class="ident">template</span>
+                .<span class="ident">push</span>(<span class="ident">Attribute</span>::<span class="ident">new</span>(<span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKA_CLASS</span>).<span class="ident">with_ck_ulong</span>(<span class="kw-2">&amp;</span><span class="ident">raw_object_class</span>));
         }
 
         <span class="ident">ctx</span>.<span class="ident">find_objects_init</span>(<span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">template</span>).<span class="ident">unwrap</span>();
@@ -796,7 +821,7 @@
 
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;objects: {:?}&quot;</span>, <span class="ident">objects</span>);
 
-        <span class="kw">if</span> <span class="ident">objects</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">objects</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No objects found&quot;</span>));
         }
         <span class="kw">if</span> <span class="ident">objects</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
@@ -806,7 +831,6 @@
         <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">objects</span>[<span class="number">0</span>];
         <span class="prelude-val">Ok</span>((<span class="ident">ctx</span>, <span class="ident">session</span>, <span class="ident">object</span>))
     }
-
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "pkcs11_uri";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
