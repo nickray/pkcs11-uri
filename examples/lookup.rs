@@ -12,20 +12,20 @@ fn main() {
 fn try_main() -> anyhow::Result<()> {
     let _uri_str = r"pkcs11:
         type=private;
-        token=lpc55-2ac0c213b4903b76;
-        object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
+        token=my-ca;
+        object=my-signing-key
             ?pin-source=file:pin.txt
             &module-path=/usr/lib/libsofthsm2.so";
     let _uri_str = r"pkcs11:
         type=private;
-        token=lpc55-2ac0c213b4903b76;
-        object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
+        token=my-ca;
+        object=my-signing-key
             ?pin-source=env:PIN
             &module-path=/usr/lib/libsofthsm2.so";
     let _uri_str = r"pkcs11:
         type=private;
-        token=lpc55-2ac0c213b4903b76;
-        object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
+        token=my-ca;
+        object=my-signing-key
             ?pin-value=1234
             &module-path=/usr/lib/libsofthsm2.so";
     let uri = Pkcs11Uri::try_from(_uri_str)?;
