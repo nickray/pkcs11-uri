@@ -1,9 +1,10 @@
-use std::path::PathBuf;
 use pkcs11::Ctx;
 use serial_test::serial;
+use std::path::PathBuf;
 
 fn pkcs11_module_name() -> PathBuf {
-    let path = std::env::var_os("PKCS11_MODULE").unwrap_or("/usr/lib/libsofthsm2.so".into());
+    let path =
+        std::env::var_os("PKCS11_MODULE").unwrap_or_else(|| "/usr/lib/libsofthsm2.so".into());
     let path_buf = PathBuf::from(path);
     if !path_buf.exists() {
         panic!("Set location of PKCS#11 module with `PKCS11_MODULE` environment variable");
@@ -21,7 +22,10 @@ fn new_then_initialize() {
         "failed to initialize session: {}",
         res.unwrap_err()
     );
-    assert!(session.is_initialized(), "internal state is not initialized");
+    assert!(
+        session.is_initialized(),
+        "internal state is not initialized"
+    );
 }
 
 #[test]

@@ -1,0 +1,34 @@
+name: Basic tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      PKCS11_MODULE: /usr/lib/softhsm/libsofthsm2.so
+    steps:
+    - uses: actions/checkout@v2
+    # - name: SoftHSM installation
+    #   run: |
+    #     sudo apt-get install -f libsofthsm2
+    #     sudo usermod -a -G softhsm $USER
+    - name: build
+      run: cargo build
+    # - name: test
+    #   run: |
+    #     sg softhsm -c 'cargo test'
+    # - name: setup token
+    #   run: |
+    #     sg softhsm -c 'softhsm2-util --init-token --free --label lpc55-2ac0c213b4903b76 --pin 1234 --so-pin 1234'
+    - name: rustfmt
+      run: cargo fmt -- --check
+    - name: clippy
+      run: cargo clean && cargo clippy --all-targets --all-features -- -D warnings

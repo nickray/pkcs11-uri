@@ -14,7 +14,7 @@ use core::convert::{TryFrom, TryInto};
 use log::{debug, trace};
 pub type Context = pkcs11::Ctx;
 pub type SessionHandle = pkcs11::types::CK_SESSION_HANDLE;
-pub type ObjectHandle =  pkcs11::types::CK_OBJECT_HANDLE;
+pub type ObjectHandle = pkcs11::types::CK_OBJECT_HANDLE;
 pub type SlotId = pkcs11::types::CK_SLOT_ID;
 
 #[cfg(test)]
@@ -22,23 +22,26 @@ mod tests;
 
 use anyhow::anyhow;
 
-fn parse_slot_id<'a>(value: &'a str) -> Result<SlotId, &'a str> {
+fn parse_slot_id(value: &str) -> Result<SlotId, &str> {
     Ok(value.parse().or(Err(value))?)
 }
 
-fn percent_decode_string<'a>(value: &'a str) -> Result<String, &'a str> {
-    Ok(percent_encoding::percent_decode_str(value).decode_utf8().or(Err(value))?.into_owned())
+fn percent_decode_string(value: &str) -> Result<String, &str> {
+    Ok(percent_encoding::percent_decode_str(value)
+        .decode_utf8()
+        .or(Err(value))?
+        .into_owned())
 }
 
-fn percent_decode_bytes<'a>(value: &'a str) -> Result<Vec<u8>, &'a str> {
+fn percent_decode_bytes(value: &str) -> Result<Vec<u8>, &str> {
     Ok(percent_encoding::percent_decode_str(value).collect())
 }
 
-fn parse_object_class<'a>(value: &'a str) -> Result<ObjectClass, &'a str> {
+fn parse_object_class(value: &str) -> Result<ObjectClass, &str> {
     Ok(value.try_into().or(Err(value))?)
 }
 
-fn parse_library_version<'a>(value: &'a str) -> Result<Version, &'a str> {
+fn parse_library_version(value: &str) -> Result<Version, &str> {
     Ok(if value.contains('.') {
         let tuple: Vec<&str> = value.splitn(2, '.').collect();
         let [major, minor]: [&str; 2] = tuple.as_slice().try_into().unwrap();
@@ -57,10 +60,10 @@ fn parse_library_version<'a>(value: &'a str) -> Result<Version, &'a str> {
 // In rust-pkcs11, this is `pkcs11::types::padding::BlankPaddedString16`, even though the docs
 // claim it's a UTF-8 string
 
-fn parse_serial_number<'a>(value: &'a str) -> Result<[u8; 16], &'a str> {
+fn parse_serial_number(value: &str) -> Result<[u8; 16], &str> {
     let mut characters: Vec<u8> = percent_encoding::percent_decode_str(value).collect();
     if characters.len() > 16 {
-        return Err(value)
+        Err(value)
     } else {
         characters.resize(16, b' ');
         Ok(characters.try_into().unwrap())
@@ -161,7 +164,7 @@ impl<'a> TryFrom<&'a str> for ObjectClass {
             "private" => PrivateKey,
             "public" => PublicKey,
             "secret-key" => SecretKey,
-            _ => Err(s)?,
+            _ => return Err(s),
         })
     }
 }
@@ -193,25 +196,16 @@ pub struct Pkcs11Uri {
 
 impl Pkcs11Uri {
     /// TryFrom as inherent method
-    pub fn try_parse(uri_str: &str) -> anyhow::Result<Self> {
-        Self::try_from(uri_str)
-    }
-}
-
-impl<'a> TryFrom<&'a str> for Pkcs11Uri {
-    type Error = anyhow::Error;
-
-    fn try_from(uri_str: &str) -> std::result::Result<Self, Self::Error> {
-
+    pub fn try_from(uri_str: &str) -> anyhow::Result<Self> {
         // 0. strip whitespace
         let uri_string: String = uri_str.chars().filter(|c| !c.is_whitespace()).collect();
 
         // 1. uriparse from string, check validity
-
         let uri = uriparse::URIReference::try_from(uri_string.as_str())?;
         // dbg!(&uri);
 
-        if uri.scheme() != Some(&uriparse::Scheme::PKCS11) {
+        // if uri.scheme() != Some(&uriparse::Scheme::PKCS11) {
+        if uri.scheme() != Some(&uriparse::Scheme::PKCKS11) {
             return Err(anyhow!("URI should have PKCS11 scheme"));
         }
         if uri.authority().is_some() {
@@ -233,14 +227,24 @@ impl<'a> TryFrom<&'a str> for Pkcs11Uri {
         let query_attributes = QueryAttributes::try_from(query).unwrap();
 
         // 4. wrap up
-        let parsed_uri = Pkcs11Uri { path_attributes, query_attributes };
+        let parsed_uri = Pkcs11Uri {
+            path_attributes,
+            query_attributes,
+        };
 
         Ok(parsed_uri)
     }
 }
 
-impl Pkcs11Uri {
+impl<'a> TryFrom<&'a str> for Pkcs11Uri {
+    type Error = anyhow::Error;
 
+    fn try_from(uri_str: &str) -> std::result::Result<Self, Self::Error> {
+        Self::try_from(uri_str)
+    }
+}
+
+impl Pkcs11Uri {
     fn matches_slot(&self, ctx: &pkcs11::Ctx, slot_id: pkcs11::types::CK_SLOT_ID) -> bool {
         // slot_id, slot_description, slot_manufacturer
 
@@ -309,11 +313,12 @@ impl Pkcs11Uri {
         let ctx = self.context();
 
         let slots: Vec<u64> = ctx
-            .get_slot_list(true).unwrap()
-            .iter().copied()
+            .get_slot_list(true)
+            .unwrap()
+            .iter()
+            .copied()
             .filter(|slot| self.matches_slot(&ctx, *slot))
-            .collect()
-        ;
+            .collect();
 
         Ok(slots)
     }
@@ -322,12 +327,13 @@ impl Pkcs11Uri {
         let ctx = self.context();
 
         let slots: Vec<u64> = ctx
-            .get_slot_list(true).unwrap()
-            .iter().copied()
+            .get_slot_list(true)
+            .unwrap()
+            .iter()
+            .copied()
             .filter(|slot| self.matches_slot(&ctx, *slot))
             .filter(|slot| self.matches_token(&ctx, *slot))
-            .collect()
-        ;
+            .collect();
 
         Ok(slots)
     }
@@ -337,16 +343,17 @@ impl Pkcs11Uri {
 
         // 1. find the slot
         let slots: Vec<u64> = ctx
-            .get_slot_list(true).unwrap()
-            .iter().copied()
+            .get_slot_list(true)
+            .unwrap()
+            .iter()
+            .copied()
             .filter(|slot| self.matches_slot(&ctx, *slot))
             .filter(|slot| self.matches_token(&ctx, *slot))
-            .collect()
-        ;
+            .collect();
 
         debug!("slots: {:?}", slots);
 
-        if slots.len() == 0 {
+        if slots.is_empty() {
             return Err(anyhow!("No slots found"));
         }
         if slots.len() > 1 {
@@ -358,10 +365,15 @@ impl Pkcs11Uri {
         // 2. create a logged-in session with the slot
 
         let flags = pkcs11::types::CKF_SERIAL_SESSION | pkcs11::types::CKF_RW_SESSION;
-        let session = ctx.open_session(slot, flags, /*application: */ None, /*notify: */ None).unwrap();
+        let session = ctx
+            .open_session(
+                slot, flags, /*application: */ None, /*notify: */ None,
+            )
+            .unwrap();
         let maybe_pin: Option<&str> = self.query_attributes.pin_value.as_deref();
         trace!("{:?}", maybe_pin);
-        ctx.login(session, pkcs11::types::CKU_USER, maybe_pin).unwrap();
+        ctx.login(session, pkcs11::types::CKU_USER, maybe_pin)
+            .unwrap();
 
         // 3. find the object
         // object_class: Option<ObjectClass>
@@ -378,7 +390,8 @@ impl Pkcs11Uri {
         }
         if let Some(object_class) = &self.path_attributes.object_class {
             let raw_object_class = *object_class as u8 as _;
-            template.push(Attribute::new(pkcs11::types::CKA_CLASS).with_ck_ulong(&raw_object_class));
+            template
+                .push(Attribute::new(pkcs11::types::CKA_CLASS).with_ck_ulong(&raw_object_class));
         }
 
         ctx.find_objects_init(session, &template).unwrap();
@@ -388,7 +401,7 @@ impl Pkcs11Uri {
 
         debug!("objects: {:?}", objects);
 
-        if objects.len() == 0 {
+        if objects.is_empty() {
             return Err(anyhow!("No objects found"));
         }
         if objects.len() > 1 {
@@ -398,5 +411,4 @@ impl Pkcs11Uri {
         let object = objects[0];
         Ok((ctx, session, object))
     }
-
 }

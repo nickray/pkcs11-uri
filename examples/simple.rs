@@ -11,7 +11,7 @@ fn try_main() -> anyhow::Result<()> {
     // let uri = "pkcs11:object=my-signing-key;type=private;serial=DECC0401648?pin-source=file:/etc/token&x=y";
     // let uri = "pkcs11:object=my-signing-key;type=private;serial=DECC0401648";
     // pkcs11_uri::identify(uri)?;
-    let uri = Pkcs11Uri::try_parse(uri_str)?;
-    dbg!(uri.clone());
+    let uri = Pkcs11Uri::try_from(uri_str)?;
+    dbg!(uri);
     Ok(())
 }
