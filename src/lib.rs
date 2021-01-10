@@ -370,10 +370,33 @@ impl Pkcs11Uri {
                 slot, flags, /*application: */ None, /*notify: */ None,
             )
             .unwrap();
-        let maybe_pin: Option<&str> = self.query_attributes.pin_value.as_deref();
-        trace!("{:?}", maybe_pin);
-        ctx.login(session, pkcs11::types::CKU_USER, maybe_pin)
-            .unwrap();
+
+        if let Some(pin) = self.query_attributes.pin_value.as_deref() {
+            trace!("{:?}", pin);
+            ctx.login(session, pkcs11::types::CKU_USER, Some(pin))
+                .unwrap();
+        } else if let Some(source) = self.query_attributes.pin_source.as_deref() {
+            if let Some(index) = source.find(':') {
+                let scheme = &source[..index];
+                match scheme {
+                    "env" => {
+                        let pin = std::env::var(&source[4..]).unwrap();
+                        trace!("{:?}", pin);
+                        ctx.login(session, pkcs11::types::CKU_USER, Some(&pin))
+                            .unwrap();
+                    }
+                    "file" => {
+                        let pin = String::from_utf8_lossy(&std::fs::read(&source[5..]).unwrap()).trim().to_string();
+                        trace!("{:?}", pin);
+                        ctx.login(session, pkcs11::types::CKU_USER, Some(pin.as_str()))
+                            .unwrap();
+                    }
+                    _ => {}
+                }
+            }
+        } else {
+            ctx.login(session, pkcs11::types::CKU_USER, None).unwrap();
+        }
 
         // 3. find the object
         // object_class: Option<ObjectClass>

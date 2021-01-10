@@ -10,13 +10,25 @@ fn main() {
     }
 }
 fn try_main() -> anyhow::Result<()> {
-    let uri_str = r"pkcs11:
+    let _uri_str = r"pkcs11:
+        type=private;
+        token=lpc55-2ac0c213b4903b76;
+        object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
+            ?pin-source=file:pin.txt
+            &module-path=/usr/lib/libsofthsm2.so";
+    let _uri_str = r"pkcs11:
+        type=private;
+        token=lpc55-2ac0c213b4903b76;
+        object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
+            ?pin-source=env:PIN
+            &module-path=/usr/lib/libsofthsm2.so";
+    let _uri_str = r"pkcs11:
         type=private;
         token=lpc55-2ac0c213b4903b76;
         object=lpc55-2ac0c213b4903b76%20@%202021-01-08T20:41:24
             ?pin-value=1234
             &module-path=/usr/lib/libsofthsm2.so";
-    let uri = Pkcs11Uri::try_from(uri_str)?;
+    let uri = Pkcs11Uri::try_from(_uri_str)?;
     let (context, session, object) = uri.identify_object().unwrap();
 
     //  CKM_SHA256_RSA_PKCS
