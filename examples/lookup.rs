@@ -45,5 +45,6 @@ fn try_main() -> anyhow::Result<()> {
     let signature = context.sign(session, &data).unwrap();
 
     println!("signature: {:x?}", signature.as_slice());
+    assert_eq!(signature.len(), 256);
     Ok(())
 }

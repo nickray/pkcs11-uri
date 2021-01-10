@@ -244,6 +244,11 @@ impl<'a> TryFrom<&'a str> for Pkcs11Uri {
     }
 }
 
+pub fn split_once(s: &str, delimiter: char) -> Option<(&str, &str)> {
+    let i = s.find(delimiter)?;
+    Some((&s[..i], &s[i + 1..]))
+}
+
 impl Pkcs11Uri {
     fn matches_slot(&self, ctx: &pkcs11::Ctx, slot_id: pkcs11::types::CK_SLOT_ID) -> bool {
         // slot_id, slot_description, slot_manufacturer
@@ -376,17 +381,18 @@ impl Pkcs11Uri {
             ctx.login(session, pkcs11::types::CKU_USER, Some(pin))
                 .unwrap();
         } else if let Some(source) = self.query_attributes.pin_source.as_deref() {
-            if let Some(index) = source.find(':') {
-                let scheme = &source[..index];
+            if let Some((scheme, content)) = split_once(source, ':') {
                 match scheme {
                     "env" => {
-                        let pin = std::env::var(&source[4..]).unwrap();
+                        let pin = std::env::var(content).unwrap();
                         trace!("{:?}", pin);
                         ctx.login(session, pkcs11::types::CKU_USER, Some(&pin))
                             .unwrap();
                     }
                     "file" => {
-                        let pin = String::from_utf8_lossy(&std::fs::read(&source[5..]).unwrap()).trim().to_string();
+                        let pin = String::from_utf8_lossy(&std::fs::read(content).unwrap())
+                            .trim()
+                            .to_string();
                         trace!("{:?}", pin);
                         ctx.login(session, pkcs11::types::CKU_USER, Some(pin.as_str()))
                             .unwrap();
