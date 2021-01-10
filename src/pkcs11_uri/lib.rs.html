@@ -438,6 +438,12 @@
 <span id="435">435</span>
 <span id="436">436</span>
 <span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! PKCS#11 URI</span>
 <span class="doccomment">//!</span>
@@ -685,6 +691,11 @@
     }
 }
 
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_once</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">delimiter</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="ident">delimiter</span>)<span class="question-mark">?</span>;
+    <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">i</span>], <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..]))
+}
+
 <span class="kw">impl</span> <span class="ident">Pkcs11Uri</span> {
     <span class="kw">fn</span> <span class="ident">matches_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs11</span>::<span class="ident">Ctx</span>, <span class="ident">slot_id</span>: <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CK_SLOT_ID</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="comment">// slot_id, slot_description, slot_manufacturer</span>
@@ -817,17 +828,18 @@
             <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="prelude-val">Some</span>(<span class="ident">pin</span>))
                 .<span class="ident">unwrap</span>();
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">source</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_attributes</span>.<span class="ident">pin_source</span>.<span class="ident">as_deref</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">source</span>.<span class="ident">find</span>(<span class="string">&#39;:&#39;</span>) {
-                <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">source</span>[..<span class="ident">index</span>];
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">scheme</span>, <span class="ident">content</span>)) <span class="op">=</span> <span class="ident">split_once</span>(<span class="ident">source</span>, <span class="string">&#39;:&#39;</span>) {
                 <span class="kw">match</span> <span class="ident">scheme</span> {
                     <span class="string">&quot;env&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">pin</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>[<span class="number">4</span>..]).<span class="ident">unwrap</span>();
+                        <span class="kw">let</span> <span class="ident">pin</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>();
                         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">pin</span>);
                         <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">pin</span>))
                             .<span class="ident">unwrap</span>();
                     }
                     <span class="string">&quot;file&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">pin</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>[<span class="number">5</span>..]).<span class="ident">unwrap</span>()).<span class="ident">trim</span>().<span class="ident">to_string</span>();
+                        <span class="kw">let</span> <span class="ident">pin</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">read</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>())
+                            .<span class="ident">trim</span>()
+                            .<span class="ident">to_string</span>();
                         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">pin</span>);
                         <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="prelude-val">Some</span>(<span class="ident">pin</span>.<span class="ident">as_str</span>()))
                             .<span class="ident">unwrap</span>();
