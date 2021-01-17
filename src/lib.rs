@@ -317,7 +317,7 @@ impl Pkcs11Uri {
     pub fn identify_slots(&self) -> anyhow::Result<Vec<SlotId>> {
         let ctx = self.context();
 
-        let slots: Vec<u64> = ctx
+        let slots: Vec<SlotId> = ctx
             .get_slot_list(true)
             .unwrap()
             .iter()
@@ -331,7 +331,7 @@ impl Pkcs11Uri {
     pub fn identify_tokens(&self) -> anyhow::Result<Vec<SlotId>> {
         let ctx = self.context();
 
-        let slots: Vec<u64> = ctx
+        let slots: Vec<SlotId> = ctx
             .get_slot_list(true)
             .unwrap()
             .iter()
@@ -347,7 +347,7 @@ impl Pkcs11Uri {
         let ctx = self.context();
 
         // 1. find the slot
-        let slots: Vec<u64> = ctx
+        let slots: Vec<SlotId> = ctx
             .get_slot_list(true)
             .unwrap()
             .iter()
