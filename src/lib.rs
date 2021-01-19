@@ -301,7 +301,7 @@ impl Pkcs11Uri {
             }
         }
         if let Some(token_serial) = &self.path_attributes.token_serial {
-            if token_serial != String::from(info.serialNumber).as_str().as_bytes() {
+            if token_serial != &info.serialNumber.0 {
                 trace!("failed token_serial check");
                 return false;
             }
