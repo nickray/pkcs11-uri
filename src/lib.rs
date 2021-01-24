@@ -192,6 +192,7 @@ generate! { (QueryAttributes, '&'):
 pub struct Pkcs11Uri {
     pub path_attributes: PathAttributes,
     pub query_attributes: QueryAttributes,
+    raw_uri: String,
 }
 
 impl Pkcs11Uri {
@@ -230,6 +231,7 @@ impl Pkcs11Uri {
         let parsed_uri = Pkcs11Uri {
             path_attributes,
             query_attributes,
+            raw_uri: uri_string,
         };
 
         Ok(parsed_uri)
@@ -359,7 +361,7 @@ impl Pkcs11Uri {
         debug!("slots: {:?}", slots);
 
         if slots.is_empty() {
-            return Err(anyhow!("No slots found"));
+            return Err(anyhow!("No slots found for URI `{}`", &self.raw_uri));
         }
         if slots.len() > 1 {
             return Err(anyhow!("Not implemented for multiple applicable slots"));
@@ -401,7 +403,8 @@ impl Pkcs11Uri {
                 }
             }
         } else {
-            ctx.login(session, pkcs11::types::CKU_USER, None).unwrap();
+            // no PIN = no login
+            // ctx.login(session, pkcs11::types::CKU_USER, None).unwrap();
         }
 
         // 3. find the object
@@ -431,7 +434,7 @@ impl Pkcs11Uri {
         debug!("objects: {:?}", objects);
 
         if objects.is_empty() {
-            return Err(anyhow!("No objects found"));
+            return Err(anyhow!("No objects found for URI `{}`", &self.raw_uri));
         }
         if objects.len() > 1 {
             return Err(anyhow!("Not implemented for multiple applicable objects"));

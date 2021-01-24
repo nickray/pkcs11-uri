@@ -44,18 +44,23 @@ fn try_main() -> anyhow::Result<()> {
     let data = String::from("PKCS #11 is pretty horrible").into_bytes();
     let signature = context.sign(session, &data).unwrap();
 
-    println!("signature: \n{}", hex_str!(signature.as_slice(), 32, sep: "\n"));
+    println!(
+        "signature: \n{}",
+        hex_str!(signature.as_slice(), 32, sep: "\n")
+    );
     assert_eq!(signature.len(), 256);
 
-    let /*mut*/ n_buffer = [0u8; 256];  // rust-pkcs11 API is sloppy here; 256B = 2048b is enough for RSA2k keys
-    let /*mut*/ e_buffer = [0u8; 3];    // always 0x10001 = u16::MAX + 2 anyway
+    let /*mut*/ n_buffer = [0u8; 256]; // rust-pkcs11 API is sloppy here; 256B = 2048b is enough for RSA2k keys
+    let /*mut*/ e_buffer = [0u8; 3]; // always 0x10001 = u16::MAX + 2 anyway
     let mut n_attribute = types::CK_ATTRIBUTE::new(types::CKA_MODULUS);
     n_attribute.set_biginteger(&n_buffer);
     let mut e_attribute = types::CK_ATTRIBUTE::new(types::CKA_PUBLIC_EXPONENT);
     e_attribute.set_biginteger(&e_buffer);
     let mut template = vec![n_attribute, e_attribute];
 
-    let (rv, attributes) = context.get_attribute_value(session, object, &mut template).unwrap();
+    let (rv, attributes) = context
+        .get_attribute_value(session, object, &mut template)
+        .unwrap();
     assert_eq!(rv, 0);
     let n = attributes[0].get_biginteger().unwrap();
     let e = attributes[1].get_biginteger().unwrap();
@@ -71,7 +76,9 @@ fn try_main() -> anyhow::Result<()> {
 
     let digest = sha256(&data);
     let padding_scheme = rsa::PaddingScheme::new_pkcs1v15_sign(Some(rsa::Hash::SHA2_256));
-    public_key.verify(padding_scheme, &digest, &signature).unwrap();
+    public_key
+        .verify(padding_scheme, &digest, &signature)
+        .unwrap();
 
     Ok(())
 }
