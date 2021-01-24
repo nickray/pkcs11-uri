@@ -445,6 +445,8 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! PKCS#11 URI</span>
 <span class="doccomment">//!</span>
@@ -640,6 +642,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pkcs11Uri</span> {
     <span class="kw">pub</span> <span class="ident">path_attributes</span>: <span class="ident">PathAttributes</span>,
     <span class="kw">pub</span> <span class="ident">query_attributes</span>: <span class="ident">QueryAttributes</span>,
+    <span class="ident">raw_uri</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Pkcs11Uri</span> {
@@ -678,6 +681,7 @@
         <span class="kw">let</span> <span class="ident">parsed_uri</span> <span class="op">=</span> <span class="ident">Pkcs11Uri</span> {
             <span class="ident">path_attributes</span>,
             <span class="ident">query_attributes</span>,
+            <span class="ident">raw_uri</span>: <span class="ident">uri_string</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">parsed_uri</span>)
@@ -807,7 +811,7 @@
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;slots: {:?}&quot;</span>, <span class="ident">slots</span>);
 
         <span class="kw">if</span> <span class="ident">slots</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No slots found&quot;</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No slots found for URI {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_uri</span>));
         }
         <span class="kw">if</span> <span class="ident">slots</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;Not implemented for multiple applicable slots&quot;</span>));
@@ -880,7 +884,7 @@
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;objects: {:?}&quot;</span>, <span class="ident">objects</span>);
 
         <span class="kw">if</span> <span class="ident">objects</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No objects found&quot;</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;No objects found for URI {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_uri</span>));
         }
         <span class="kw">if</span> <span class="ident">objects</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;Not implemented for multiple applicable objects&quot;</span>));
