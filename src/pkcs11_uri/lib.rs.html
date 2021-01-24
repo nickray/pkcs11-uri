@@ -444,6 +444,7 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! PKCS#11 URI</span>
 <span class="doccomment">//!</span>
@@ -848,7 +849,8 @@
                 }
             }
         } <span class="kw">else</span> {
-            <span class="ident">ctx</span>.<span class="ident">login</span>(<span class="ident">session</span>, <span class="ident">pkcs11</span>::<span class="ident">types</span>::<span class="ident">CKU_USER</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+            <span class="comment">// no PIN = no login</span>
+            <span class="comment">// ctx.login(session, pkcs11::types::CKU_USER, None).unwrap();</span>
         }
 
         <span class="comment">// 3. find the object</span>
