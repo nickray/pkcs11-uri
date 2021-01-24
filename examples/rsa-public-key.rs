@@ -63,8 +63,10 @@ fn try_main() -> anyhow::Result<()> {
     dbg!(n.to_str_radix(10));
     assert_eq!(e.to_str_radix(10), "65537");
 
-    let n = rsa::BigUint::from_bytes_be(&n.to_bytes_be());
-    let e = rsa::BigUint::from_bytes_be(&e.to_bytes_be());
+    // This be/le swap is due to a bug in `rust-pkcs11`:
+    // https://github.com/mheese/rust-pkcs11/issues/44
+    let n = rsa::BigUint::from_bytes_be(&n.to_bytes_le());
+    let e = rsa::BigUint::from_bytes_be(&e.to_bytes_le());
     let public_key = rsa::RSAPublicKey::new(n, e).unwrap();
 
     let digest = sha256(&data);
