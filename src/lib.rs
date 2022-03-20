@@ -205,8 +205,7 @@ impl Pkcs11Uri {
         let uri = uriparse::URIReference::try_from(uri_string.as_str())?;
         // dbg!(&uri);
 
-        // if uri.scheme() != Some(&uriparse::Scheme::PKCS11) {
-        if uri.scheme() != Some(&uriparse::Scheme::PKCKS11) {
+        if uri.scheme() != Some(&uriparse::Scheme::PKCS11) {
             return Err(anyhow!("URI should have PKCS11 scheme"));
         }
         if uri.authority().is_some() {
