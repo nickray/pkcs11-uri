@@ -23,7 +23,7 @@ mod tests;
 use anyhow::anyhow;
 
 fn parse_slot_id(value: &str) -> Result<SlotId, &str> {
-    Ok(value.parse().or(Err(value))?)
+    value.parse().or(Err(value))
 }
 
 fn percent_decode_string(value: &str) -> Result<String, &str> {
@@ -38,7 +38,7 @@ fn percent_decode_bytes(value: &str) -> Result<Vec<u8>, &str> {
 }
 
 fn parse_object_class(value: &str) -> Result<ObjectClass, &str> {
-    Ok(value.try_into().or(Err(value))?)
+    value.try_into().or(Err(value))
 }
 
 fn parse_library_version(value: &str) -> Result<Version, &str> {

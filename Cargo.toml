@@ -1,6 +1,6 @@
 [package]
 name = "pkcs11-uri"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Nicolas Stalder <n@stalder.io>"]
 edition = "2018"
 description = "PKCS #11 URI parser"
