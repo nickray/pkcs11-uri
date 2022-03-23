@@ -17,7 +17,7 @@ anyhow = "1"
 log = "0.4.11"
 percent-encoding = "2.1.0"
 pkcs11 = "0.5.0"
-uriparse = "0.6.3"
+uriparse = "0.6.4"
 # uriparse = { git = "https://github.com/sgodwincs/uriparse-rs", rev = "82de33ab5685c71810e61ba376cc637f26f2f182" }
 
 [dev-dependencies]
