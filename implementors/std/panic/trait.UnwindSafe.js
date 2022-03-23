@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["pkcs11_uri"] = [{"text":"impl UnwindSafe for Version","synthetic":true,"types":[]},{"text":"impl UnwindSafe for PathAttributes","synthetic":true,"types":[]},{"text":"impl UnwindSafe for QueryAttributes","synthetic":true,"types":[]},{"text":"impl UnwindSafe for Pkcs11Uri","synthetic":true,"types":[]},{"text":"impl UnwindSafe for ObjectClass","synthetic":true,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
