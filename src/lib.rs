@@ -222,10 +222,14 @@ impl Pkcs11Uri {
         let path_attributes = PathAttributes::try_from(segment).unwrap();
 
         // 3. parse Query Attributes
+        let mut query_attributes = QueryAttributes::default();
         let query = uri.query().map(|query| query.as_str()).unwrap_or("");
         debug!("query: {}", query);
-        let query_attributes = QueryAttributes::try_from(query).unwrap();
 
+        if !query.is_empty() {
+            query_attributes = QueryAttributes::try_from(query).unwrap();
+        }
+        
         // 4. wrap up
         let parsed_uri = Pkcs11Uri {
             path_attributes,
